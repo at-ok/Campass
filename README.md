@@ -13,8 +13,9 @@ Campass is a comprehensive academic planner and scheduling application designed 
 ## Tech Stack
 
 - **Frontend**: React, Vite, Tailwind CSS, Radix UI
-- **Backend**: Express, tRPC
-- **Database**: MySQL, Drizzle ORM
+- **Backend**: Hono, tRPC
+- **Database**: PostgreSQL (Neon), Drizzle ORM
+- **Authentication**: Better Auth
 - **Language**: TypeScript
 
 ## Getting Started
@@ -23,7 +24,7 @@ Campass is a comprehensive academic planner and scheduling application designed 
 
 - Node.js (v20+ recommended)
 - pnpm
-- MySQL Database
+- PostgreSQL Database (Neon recommended)
 
 ### Installation
 
@@ -33,14 +34,15 @@ Campass is a comprehensive academic planner and scheduling application designed 
    pnpm install
    ```
 3. Set up environment variables:
-   Create a `.env` file in the root directory and add your database connection string:
+   Create a `.env` file in the root directory and add your database connection string and auth secret:
    ```
-   DATABASE_URL="mysql://user:password@host:port/database"
+   DATABASE_URL="postgresql://user:password@host:port/database"
+   BETTER_AUTH_SECRET="your_random_secret"
    ```
 4. Push database schema:
    ```bash
    pnpm run db:push
-    ```
+   ```
 
 ### Running the App
 
