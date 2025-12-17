@@ -10,7 +10,7 @@ import {
   InsertTask,
   InsertExam,
   InsertEvent,
-} from "../drizzle/schema";
+} from "../shared/schema";
 
 // Initialize DB Synchronously
 if (!process.env.DATABASE_URL) {

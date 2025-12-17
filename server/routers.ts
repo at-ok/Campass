@@ -112,7 +112,6 @@ export const appRouter = router({
         })
       )
       .mutation(async ({ ctx, input }) => {
-        // @ts-ignore - input types need strict alignment but coercion helps
         return db.createTask({ ...input, userId: ctx.user.id });
       }),
     update: protectedProcedure
@@ -130,7 +129,6 @@ export const appRouter = router({
       )
       .mutation(async ({ ctx, input }) => {
         const { id, ...data } = input;
-        // @ts-ignore
         await db.updateTask(id, ctx.user.id, data);
         return { success: true };
       }),
@@ -179,7 +177,6 @@ export const appRouter = router({
         })
       )
       .mutation(async ({ ctx, input }) => {
-        // @ts-ignore
         return db.createExam({ ...input, userId: ctx.user.id });
       }),
     update: protectedProcedure
@@ -200,7 +197,6 @@ export const appRouter = router({
       )
       .mutation(async ({ ctx, input }) => {
         const { id, ...data } = input;
-        // @ts-ignore
         await db.updateExam(id, ctx.user.id, data);
         return { success: true };
       }),
@@ -246,7 +242,6 @@ export const appRouter = router({
         })
       )
       .mutation(async ({ ctx, input }) => {
-        // @ts-ignore
         return db.createEvent({ ...input, userId: ctx.user.id });
       }),
     update: protectedProcedure
@@ -266,7 +261,6 @@ export const appRouter = router({
       )
       .mutation(async ({ ctx, input }) => {
         const { id, ...data } = input;
-        // @ts-ignore
         await db.updateEvent(id, ctx.user.id, data);
         return { success: true };
       }),

@@ -1,5 +1,5 @@
 import type { FetchCreateContextFnOptions } from "@trpc/server/adapters/fetch";
-import type { User, Session } from "../../drizzle/schema";
+import type { User, Session } from "../../shared/schema";
 import { auth } from "../auth";
 
 export type TrpcContext = {

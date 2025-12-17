@@ -34,11 +34,46 @@ Campass is a comprehensive academic planner and scheduling application designed 
    pnpm install
    ```
 3. Set up environment variables:
-   Create a `.env` file in the root directory and add your database connection string and auth secret:
+   Create a `.env` file in the root directory and add the following variables:
+
    ```
    DATABASE_URL="postgresql://user:password@host:port/database"
    BETTER_AUTH_SECRET="your_random_secret"
+   GOOGLE_CLIENT_ID="your_google_client_id"
+   GOOGLE_CLIENT_SECRET="your_google_client_secret"
    ```
+
+   **Google OAuth Setup:**
+
+   To enable Google authentication, you need to set up OAuth 2.0 credentials in Google Cloud Platform:
+
+   a. Go to [Google Cloud Console](https://console.cloud.google.com/)
+
+   b. Create a new project or select an existing one
+
+   c. Navigate to **APIs & Services** > **Credentials**
+
+   d. Click **Create Credentials** > **OAuth client ID**
+
+   e. Configure the OAuth consent screen if you haven't already:
+   - Select **External** user type
+   - Fill in the required app information
+   - Add authorized domains if needed
+
+   f. Create OAuth 2.0 Client ID:
+   - Application type: **Web application**
+   - Name: Your app name (e.g., "Campass")
+   - Authorized redirect URIs:
+     - `http://localhost:3000/api/auth/callback/google` (for development)
+     - `https://your-domain.com/api/auth/callback/google` (for production)
+
+   g. Copy the **Client ID** and **Client Secret** and add them to your `.env` file
+
+   **Note for Production:**
+   - The redirect URI must point to your **backend server** URL, not the frontend
+   - Example: If your frontend is at `https://app.example.com` and backend is at `https://api.example.com`, use `https://api.example.com/api/auth/callback/google`
+   - The application automatically redirects users to the frontend after successful authentication
+
 4. Push database schema:
    ```bash
    pnpm run db:push

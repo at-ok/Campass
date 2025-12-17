@@ -61,7 +61,7 @@ export default function Signup() {
     try {
       await signIn.social({
         provider: "google",
-        callbackURL: "/",
+        callbackURL: window.location.origin,
       });
     } catch {
       toast.error("Google サインアップに失敗しました");

@@ -419,7 +419,7 @@ export default function Home() {
                       <React.Fragment key={period}>
                         <tr>
                           <td className="p-1 sm:p-2 text-xs text-muted-foreground align-middle">
-                            <div className="font-medium">{period}限</div>
+                            <div className="font-medium text-lg">{period}</div>
                             <div className="text-[10px] hidden sm:block">
                               {pt.start}~{pt.end}
                             </div>
@@ -442,15 +442,15 @@ export default function Home() {
                             return (
                               <td
                                 key={day}
-                                className={`p-1 align-top ${dayIdx !== todayDayIndex ? "hidden sm:table-cell" : ""}`}
+                                className={`p-0.5 align-top ${dayIdx !== todayDayIndex ? "hidden sm:table-cell" : ""}`}
                                 rowSpan={cls?.periodCount === 2 ? 2 : 1}
                               >
                                 <button
                                   onClick={() => handleCellClick(day, period)}
-                                  className={`w-full p-2 rounded-lg min-h-[60px] sm:min-h-[70px] text-left transition-all ${
+                                  className={`w-full h-full p-2 rounded-lg min-h-[60px] sm:min-h-[70px] text-left transition-all flex flex-col ${
                                     cls
                                       ? `${pastelBgColors[cls.color || "blue"]} hover:opacity-80`
-                                      : "bg-muted/30 hover:bg-muted/50"
+                                      : "bg-muted/30 hover:bg-muted/50 group"
                                   } ${isCurrentCell ? "ring-2 ring-primary ring-offset-2" : ""}`}
                                 >
                                   {cls ? (
@@ -465,7 +465,7 @@ export default function Home() {
                                       )}
                                     </>
                                   ) : (
-                                    <div className="flex items-center justify-center h-full opacity-0 hover:opacity-50">
+                                    <div className="flex items-center justify-center flex-1 opacity-0 group-hover:opacity-50 transition-opacity">
                                       <Plus className="h-4 w-4" />
                                     </div>
                                   )}
