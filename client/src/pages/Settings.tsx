@@ -57,7 +57,7 @@ export default function SettingsPage() {
               {theme === "dark" ? <Moon className="h-5 w-5 text-primary" /> : <Sun className="h-5 w-5 text-primary" />}
               Appearance
             </CardTitle>
-            <CardDescription>Customize how Hibi looks</CardDescription>
+            <CardDescription>Customize how Campass looks</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="flex items-center justify-between">

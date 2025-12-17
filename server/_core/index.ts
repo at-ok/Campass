@@ -35,6 +35,13 @@ async function startServer() {
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
   // OAuth callback under /api/oauth/callback
   registerOAuthRoutes(app);
+
+  // Debug middleware for API requests
+  app.use("/api", (req, res, next) => {
+    console.log(`[API Log] ${req.method} ${req.url}`);
+    next();
+  });
+
   // tRPC API
   app.use(
     "/api/trpc",

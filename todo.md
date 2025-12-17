@@ -1,4 +1,4 @@
-# Hibi Project TODO
+# Campass Project TODO
 
 ## Core Features
 - [x] Database schema (classes, tasks, exams, events tables)

@@ -72,7 +72,7 @@ export default function DashboardLayout({
               <GraduationCap className="h-8 w-8 text-primary" />
             </div>
             <h1 className="text-2xl font-semibold tracking-tight text-center">
-              Welcome to Hibi
+              Welcome to Campass
             </h1>
             <p className="text-sm text-muted-foreground text-center max-w-sm">
               Your personal academic dashboard for managing classes, tasks, and exams.
@@ -214,7 +214,7 @@ function DashboardLayoutContent({
                 <div className="flex items-center gap-2 min-w-0">
                   <GraduationCap className="h-5 w-5 text-sidebar-primary" />
                   <span className="font-semibold tracking-tight truncate text-sidebar-foreground">
-                    Hibi
+                    Campass
                   </span>
                 </div>
               ) : null}
@@ -312,7 +312,7 @@ function DashboardLayoutContent({
               <div className="flex items-center gap-2">
                 <GraduationCap className="h-5 w-5 text-primary" />
                 <span className="font-medium text-foreground">
-                  {activeMenuItem?.label ?? "Hibi"}
+                  {activeMenuItem?.label ?? "Campass"}
                 </span>
               </div>
             </div>
