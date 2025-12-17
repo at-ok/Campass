@@ -11,21 +11,32 @@ import ClassesPage from "./pages/Classes";
 import TasksPage from "./pages/Tasks";
 import ExamsPage from "./pages/Exams";
 import SettingsPage from "./pages/Settings";
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
 
 function Router() {
   return (
-    <DashboardLayout>
-      <Switch>
-        <Route path="/" component={Home} />
-        <Route path="/calendar" component={CalendarPage} />
-        <Route path="/classes" component={ClassesPage} />
-        <Route path="/tasks" component={TasksPage} />
-        <Route path="/exams" component={ExamsPage} />
-        <Route path="/settings" component={SettingsPage} />
-        <Route path="/404" component={NotFound} />
-        <Route component={NotFound} />
-      </Switch>
-    </DashboardLayout>
+    <Switch>
+      {/* Auth routes - outside DashboardLayout */}
+      <Route path="/login" component={Login} />
+      <Route path="/signup" component={Signup} />
+
+      {/* Dashboard routes */}
+      <Route>
+        <DashboardLayout>
+          <Switch>
+            <Route path="/" component={Home} />
+            <Route path="/calendar" component={CalendarPage} />
+            <Route path="/classes" component={ClassesPage} />
+            <Route path="/tasks" component={TasksPage} />
+            <Route path="/exams" component={ExamsPage} />
+            <Route path="/settings" component={SettingsPage} />
+            <Route path="/404" component={NotFound} />
+            <Route component={NotFound} />
+          </Switch>
+        </DashboardLayout>
+      </Route>
+    </Switch>
   );
 }
 
