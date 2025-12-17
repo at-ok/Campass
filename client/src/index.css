@@ -1,0 +1,312 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  
+  /* Pastel color palette */
+  --color-pastel-pink: oklch(0.85 0.08 0);
+  --color-pastel-yellow: oklch(0.92 0.08 90);
+  --color-pastel-blue: oklch(0.85 0.08 240);
+  --color-pastel-green: oklch(0.88 0.08 145);
+  --color-pastel-purple: oklch(0.85 0.08 300);
+  --color-pastel-orange: oklch(0.88 0.08 50);
+}
+
+:root {
+  --primary: oklch(0.55 0.15 240);
+  --primary-foreground: oklch(0.98 0 0);
+  --sidebar-primary: oklch(0.55 0.15 240);
+  --sidebar-primary-foreground: oklch(0.98 0 0);
+  --chart-1: oklch(0.85 0.08 0);
+  --chart-2: oklch(0.92 0.08 90);
+  --chart-3: oklch(0.85 0.08 240);
+  --chart-4: oklch(0.88 0.08 145);
+  --chart-5: oklch(0.85 0.08 300);
+  --radius: 0.75rem;
+  --background: oklch(0.985 0.002 240);
+  --foreground: oklch(0.25 0.02 250);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.25 0.02 250);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.25 0.02 250);
+  --secondary: oklch(0.96 0.01 240);
+  --secondary-foreground: oklch(0.35 0.02 250);
+  --muted: oklch(0.95 0.01 240);
+  --muted-foreground: oklch(0.5 0.02 250);
+  --accent: oklch(0.95 0.02 240);
+  --accent-foreground: oklch(0.25 0.02 250);
+  --destructive: oklch(0.6 0.2 25);
+  --destructive-foreground: oklch(0.98 0 0);
+  --border: oklch(0.92 0.01 240);
+  --input: oklch(0.92 0.01 240);
+  --ring: oklch(0.55 0.15 240);
+  --sidebar: oklch(0.97 0.01 240);
+  --sidebar-foreground: oklch(0.35 0.02 250);
+  --sidebar-accent: oklch(0.93 0.02 240);
+  --sidebar-accent-foreground: oklch(0.25 0.02 250);
+  --sidebar-border: oklch(0.9 0.01 240);
+  --sidebar-ring: oklch(0.55 0.15 240);
+}
+
+.dark {
+  --primary: oklch(0.7 0.12 240);
+  --primary-foreground: oklch(0.15 0.02 250);
+  --sidebar-primary: oklch(0.7 0.12 240);
+  --sidebar-primary-foreground: oklch(0.15 0.02 250);
+  --background: oklch(0.15 0.02 250);
+  --foreground: oklch(0.92 0.01 240);
+  --card: oklch(0.2 0.02 250);
+  --card-foreground: oklch(0.92 0.01 240);
+  --popover: oklch(0.2 0.02 250);
+  --popover-foreground: oklch(0.92 0.01 240);
+  --secondary: oklch(0.25 0.02 250);
+  --secondary-foreground: oklch(0.85 0.01 240);
+  --muted: oklch(0.28 0.02 250);
+  --muted-foreground: oklch(0.7 0.02 240);
+  --accent: oklch(0.28 0.02 250);
+  --accent-foreground: oklch(0.95 0.01 240);
+  --destructive: oklch(0.65 0.18 25);
+  --destructive-foreground: oklch(0.98 0 0);
+  --border: oklch(0.3 0.02 250);
+  --input: oklch(0.3 0.02 250);
+  --ring: oklch(0.7 0.12 240);
+  --chart-1: oklch(0.75 0.1 0);
+  --chart-2: oklch(0.8 0.1 90);
+  --chart-3: oklch(0.75 0.1 240);
+  --chart-4: oklch(0.78 0.1 145);
+  --chart-5: oklch(0.75 0.1 300);
+  --sidebar: oklch(0.12 0.02 250);
+  --sidebar-foreground: oklch(0.92 0.01 240);
+  --sidebar-accent: oklch(0.22 0.02 250);
+  --sidebar-accent-foreground: oklch(0.98 0 0);
+  --sidebar-border: oklch(0.25 0.02 250);
+  --sidebar-ring: oklch(0.7 0.12 240);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]),
+  [type="button"]:not(:disabled),
+  [type="submit"]:not(:disabled),
+  [type="reset"]:not(:disabled),
+  a[href],
+  select:not(:disabled),
+  input[type="checkbox"]:not(:disabled),
+  input[type="radio"]:not(:disabled) {
+    @apply cursor-pointer;
+  }
+}
+
+@layer components {
+  .container {
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .flex {
+    min-height: 0;
+    min-width: 0;
+  }
+
+  @media (min-width: 640px) {
+    .container {
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .container {
+      padding-left: 2rem;
+      padding-right: 2rem;
+      max-width: 1280px;
+    }
+  }
+
+  /* Soft card styles */
+  .soft-card {
+    @apply bg-card rounded-2xl p-5;
+    box-shadow: 0 4px 20px -4px oklch(0.5 0.02 250 / 0.08), 
+                0 2px 8px -2px oklch(0.5 0.02 250 / 0.04);
+    transition: all 0.2s ease;
+  }
+
+  .soft-card:hover {
+    box-shadow: 0 6px 24px -4px oklch(0.5 0.02 250 / 0.1), 
+                0 3px 10px -3px oklch(0.5 0.02 250 / 0.05);
+  }
+
+  /* Pastel event cards */
+  .event-card-pink {
+    @apply rounded-xl p-3;
+    background: oklch(0.92 0.06 0 / 0.8);
+    border-left: 4px solid oklch(0.7 0.15 0);
+  }
+
+  .event-card-yellow {
+    @apply rounded-xl p-3;
+    background: oklch(0.95 0.06 90 / 0.8);
+    border-left: 4px solid oklch(0.75 0.15 90);
+  }
+
+  .event-card-blue {
+    @apply rounded-xl p-3;
+    background: oklch(0.92 0.06 240 / 0.8);
+    border-left: 4px solid oklch(0.6 0.15 240);
+  }
+
+  .event-card-green {
+    @apply rounded-xl p-3;
+    background: oklch(0.93 0.06 145 / 0.8);
+    border-left: 4px solid oklch(0.65 0.15 145);
+  }
+
+  .event-card-purple {
+    @apply rounded-xl p-3;
+    background: oklch(0.92 0.06 300 / 0.8);
+    border-left: 4px solid oklch(0.65 0.15 300);
+  }
+
+  /* Status badges */
+  .badge-confirmed {
+    @apply px-2 py-0.5 text-xs font-medium rounded-full;
+    background: oklch(0.93 0.06 145 / 0.8);
+    color: oklch(0.4 0.1 145);
+  }
+
+  .badge-pending {
+    @apply px-2 py-0.5 text-xs font-medium rounded-full;
+    background: oklch(0.95 0.06 90 / 0.8);
+    color: oklch(0.5 0.1 90);
+  }
+
+  .badge-cancelled {
+    @apply px-2 py-0.5 text-xs font-medium rounded-full;
+    background: oklch(0.92 0.06 0 / 0.8);
+    color: oklch(0.5 0.15 0);
+  }
+}
+
+/* FullCalendar custom styles */
+.fc {
+  --fc-border-color: oklch(0.92 0.01 240);
+  --fc-button-bg-color: oklch(0.55 0.15 240);
+  --fc-button-border-color: oklch(0.55 0.15 240);
+  --fc-button-hover-bg-color: oklch(0.5 0.15 240);
+  --fc-button-hover-border-color: oklch(0.5 0.15 240);
+  --fc-button-active-bg-color: oklch(0.45 0.15 240);
+  --fc-button-active-border-color: oklch(0.45 0.15 240);
+  --fc-today-bg-color: oklch(0.95 0.03 240 / 0.5);
+  --fc-event-border-color: transparent;
+  font-family: inherit;
+}
+
+.fc .fc-button {
+  @apply rounded-lg font-medium;
+}
+
+.fc .fc-toolbar-title {
+  @apply text-lg font-semibold;
+}
+
+.fc .fc-daygrid-day {
+  @apply transition-colors;
+}
+
+.fc .fc-daygrid-day:hover {
+  background: oklch(0.96 0.02 240 / 0.5);
+}
+
+.fc .fc-event {
+  @apply rounded-lg px-2 py-1 text-sm font-medium border-0;
+  box-shadow: 0 2px 4px -1px oklch(0.5 0.02 250 / 0.1);
+}
+
+.fc .fc-col-header-cell {
+  @apply py-3 font-medium text-muted-foreground;
+}
+
+.dark .fc {
+  --fc-border-color: oklch(0.3 0.02 250);
+  --fc-today-bg-color: oklch(0.25 0.03 240 / 0.5);
+}
+
+.dark .fc .fc-daygrid-day:hover {
+  background: oklch(0.22 0.02 250 / 0.5);
+}
+
+/* Calendar button styles - simple and clean */
+.calendar-container .fc .fc-button {
+  @apply rounded-lg font-medium transition-colors;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+.calendar-container .fc .fc-button:focus {
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+.calendar-container .fc .fc-button:active {
+  box-shadow: none !important;
+}
+
+.calendar-container .fc .fc-button-active {
+  box-shadow: none !important;
+}
+
+.calendar-container .fc .fc-button:not(:disabled):hover {
+  opacity: 0.9;
+}
+
+.calendar-container .fc .fc-button:not(:disabled):active {
+  transform: none;
+}

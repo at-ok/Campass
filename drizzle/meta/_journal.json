@@ -1,0 +1,27 @@
+{
+  "version": "7",
+  "dialect": "mysql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1765895159503,
+      "tag": "0000_third_omega_flight",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1765895301277,
+      "tag": "0001_dizzy_rawhide_kid",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1765902765719,
+      "tag": "0002_marvelous_wolfpack",
+      "breakpoints": true
+    }
+  ]
+}
