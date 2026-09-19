@@ -2,9 +2,9 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { deleteCookie, getCookie } from "hono/cookie";
 import { trpcServer } from "@hono/trpc-server";
-import { AUTH_TRUSTED_ORIGINS, auth } from "../auth";
-import { appRouter } from "../routers";
-import { createContext } from "./context";
+import { AUTH_TRUSTED_ORIGINS, auth } from "../auth.js";
+import { appRouter } from "../routers.js";
+import { createContext } from "./context.js";
 
 const app = new Hono();
 

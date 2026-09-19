@@ -49,7 +49,7 @@ VercelのAdd New → Projectからリポジトリを選び、Hobbyで作成す�
 | Framework Preset | Vite                                 |
 | Node.js          | 22.x                                 |
 | Install Command  | `pnpm install --frozen-lockfile`     |
-| Build Command    | `pnpm run build:client`              |
+| Build Command    | `pnpm run check:api && pnpm run build:client`              |
 | Output Directory | `dist/public`                        |
 
 これらのビルド・配信設定は`vercel.json`に記載済み。

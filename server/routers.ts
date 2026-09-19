@@ -1,8 +1,8 @@
-import { systemRouter } from "./_core/systemRouter";
-import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
+import { systemRouter } from "./_core/systemRouter.js";
+import { publicProcedure, protectedProcedure, router } from "./_core/trpc.js";
 import { z } from "zod";
-import * as db from "./db";
-import { auth } from "./auth";
+import * as db from "./db.js";
+import { auth } from "./auth.js";
 import { TRPCError } from "@trpc/server";
 
 export const appRouter = router({

@@ -10,7 +10,7 @@ import {
   InsertTask,
   InsertExam,
   InsertEvent,
-} from "../shared/schema";
+} from "../shared/schema.js";
 
 // Initialize DB Synchronously
 if (!process.env.DATABASE_URL) {

@@ -2,7 +2,7 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "vite",
   "installCommand": "pnpm install --frozen-lockfile",
-  "buildCommand": "pnpm run build:client",
+  "buildCommand": "pnpm run check:api && pnpm run build:client",
   "outputDirectory": "dist/public",
   "functions": {
     "api/index.ts": { "maxDuration": 30 }

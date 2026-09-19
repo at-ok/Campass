@@ -1,8 +1,8 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { db } from "./db";
-import * as schema from "../shared/schema";
-import { getAuthConfig } from "./auth-config";
+import { db } from "./db.js";
+import * as schema from "../shared/schema.js";
+import { getAuthConfig } from "./auth-config.js";
 
 const authConfig = getAuthConfig(process.env);
 export const AUTH_TRUSTED_ORIGINS = authConfig.trustedOrigins;
