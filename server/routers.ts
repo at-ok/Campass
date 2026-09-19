@@ -248,9 +248,7 @@ export const appRouter = router({
           startDate: z.coerce.date(),
           endDate: z.coerce.date().nullable().optional(),
           allDay: z.boolean().optional(),
-          eventType: z
-            .enum(["class", "task", "exam", "reminder", "other"])
-            .optional(),
+          eventType: z.enum(["reminder", "other"]).optional(),
           color: z.string().optional(),
         })
       )
@@ -266,9 +264,7 @@ export const appRouter = router({
           startDate: z.coerce.date().optional(),
           endDate: z.coerce.date().nullable().optional(),
           allDay: z.boolean().optional(),
-          eventType: z
-            .enum(["class", "task", "exam", "reminder", "other"])
-            .optional(),
+          eventType: z.enum(["reminder", "other"]).optional(),
           color: z.string().optional(),
         })
       )

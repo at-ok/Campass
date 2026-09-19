@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -63,6 +63,7 @@ export default function Editor({
   const [failure, setFailure] = useState("");
   const [busy, setBusy] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [confirmDiscard, setConfirmDiscard] = useState(false);
   const notify = useFeedback();
   const utils = trpc.useUtils();
   const classes = trpc.classes.list.useQuery();
@@ -83,11 +84,25 @@ export default function Editor({
     control,
     handleSubmit,
     watch,
-    formState: { errors },
+    formState: { errors, isDirty },
   } = useForm<Values>({
     resolver: zodResolver(schema),
     defaultValues: defaults(request),
   });
+  useEffect(() => {
+    if (!isDirty && !busy) return;
+    const preventUnload = (event: BeforeUnloadEvent) => {
+      event.preventDefault();
+      event.returnValue = "";
+    };
+    window.addEventListener("beforeunload", preventUnload);
+    return () => window.removeEventListener("beforeunload", preventUnload);
+  }, [isDirty, busy]);
+  const requestClose = () => {
+    if (busy) return;
+    if (isDirty) setConfirmDiscard(true);
+    else onClose();
+  };
   const kind = request.kind;
   const field = (name: keyof Values) => {
     const { ref, ...input } = register(name);
@@ -267,7 +282,7 @@ export default function Editor({
     <>
       <Dialog
         open
-        onClose={() => !busy && onClose()}
+        onClose={requestClose}
         fullWidth
         maxWidth="sm"
         fullScreen={mobile}
@@ -278,7 +293,7 @@ export default function Editor({
           <IconButton
             aria-label="閉じる"
             disabled={busy}
-            onClick={onClose}
+            onClick={requestClose}
             sx={{ position: "absolute", right: 16, top: 16 }}
           >
             <CloseRounded />
@@ -423,9 +438,6 @@ export default function Editor({
                       {select("eventType", "種類", [
                         { value: "other", label: "その他" },
                         { value: "reminder", label: "リマインダー" },
-                        { value: "class", label: "授業" },
-                        { value: "task", label: "課題" },
-                        { value: "exam", label: "試験" },
                       ])}
                     </>
                   )}
@@ -513,7 +525,7 @@ export default function Editor({
                 削除
               </Button>
             )}
-            <Button onClick={onClose} disabled={busy}>
+            <Button onClick={requestClose} disabled={busy}>
               キャンセル
             </Button>
             <Button type="submit" variant="contained" disabled={busy}>
@@ -521,6 +533,29 @@ export default function Editor({
             </Button>
           </DialogActions>
         </Box>
+      </Dialog>
+      <Dialog
+        open={confirmDiscard}
+        onClose={() => setConfirmDiscard(false)}
+        maxWidth="xs"
+        fullWidth
+        aria-labelledby="discard-title"
+        aria-describedby="discard-description"
+      >
+        <DialogTitle id="discard-title">変更を破棄しますか？</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="discard-description">
+            入力した変更は保存されていません。閉じると変更が失われます。
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setConfirmDiscard(false)} autoFocus>
+            編集を続ける
+          </Button>
+          <Button color="error" variant="contained" onClick={onClose}>
+            変更を破棄
+          </Button>
+        </DialogActions>
       </Dialog>
       <Dialog
         open={confirmDelete}

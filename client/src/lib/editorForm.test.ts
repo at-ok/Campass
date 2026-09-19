@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { Class, Exam } from "@shared/schema";
+import type { Class, Event, Exam } from "@shared/schema";
 import { classScheduleInput, defaults, schema } from "./editorForm";
 import { classEvents } from "./planner";
 
@@ -32,6 +32,43 @@ const exam: Exam = {
   createdAt: new Date(),
   updatedAt: new Date(),
 };
+
+describe("general event types", () => {
+  const event: Event = {
+    id: 1,
+    userId: "student",
+    title: "既存の予定",
+    description: "メモ",
+    startDate: new Date("2026-09-19T09:00:00+09:00"),
+    endDate: null,
+    allDay: false,
+    eventType: "other",
+    color: "blue",
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  };
+
+  it.each(["class", "task", "exam"] as const)(
+    "allows editing legacy %s events as general events",
+    eventType => {
+      const values = schema.parse(
+        defaults({ kind: "event", record: { ...event, eventType } })
+      );
+      expect(values.eventType).toBe("other");
+      expect(values.title).toBe(event.title);
+      expect(values.description).toBe(event.description);
+      expect(new Date(values.date)).toEqual(event.startDate);
+      expect(schema.safeParse({ ...values, eventType }).success).toBe(false);
+    }
+  );
+
+  it.each(["reminder", "other"] as const)("preserves %s", eventType => {
+    expect(
+      schema.parse(defaults({ kind: "event", record: { ...event, eventType } }))
+        .eventType
+    ).toBe(eventType);
+  });
+});
 
 describe("editor schedule preservation", () => {
   it.each([

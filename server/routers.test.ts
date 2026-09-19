@@ -242,6 +242,26 @@ describe("exams", () => {
 });
 
 describe("events", () => {
+  it.each(["class", "task", "exam"])(
+    "rejects %s as a general event type on create and update",
+    async eventType => {
+      const { ctx } = createAuthContext();
+      const caller = appRouter.createCaller(ctx);
+      // Exercise runtime validation for stale clients using the old API values.
+      const legacyType = eventType as "other";
+      await expect(
+        caller.events.create({
+          title: "Legacy category",
+          startDate: new Date(),
+          eventType: legacyType,
+        })
+      ).rejects.toMatchObject({ code: "BAD_REQUEST" });
+      await expect(
+        caller.events.update({ id: 1, eventType: legacyType })
+      ).rejects.toMatchObject({ code: "BAD_REQUEST" });
+    }
+  );
+
   it("lists events for authenticated user", async () => {
     const { ctx } = createAuthContext();
     const caller = appRouter.createCaller(ctx);

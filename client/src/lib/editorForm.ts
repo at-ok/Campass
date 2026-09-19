@@ -21,7 +21,7 @@ export const schema = z
     priority: z.enum(["low", "medium", "high"]),
     status: z.enum(["scheduled", "confirmed", "completed", "cancelled"]),
     taskStatus: z.enum(["pending", "in_progress", "completed"]),
-    eventType: z.enum(["class", "task", "exam", "reminder", "other"]),
+    eventType: z.enum(["reminder", "other"]),
     color: z.string(),
     allDay: z.boolean(),
   })
@@ -125,8 +125,8 @@ export function defaults(request: EditorRequest): Values {
         ? (request.record?.status ?? "pending")
         : "pending",
     eventType:
-      request.kind === "event"
-        ? (request.record?.eventType ?? "other")
+      request.kind === "event" && request.record?.eventType === "reminder"
+        ? "reminder"
         : "other",
     color:
       record?.color ??
