@@ -22,20 +22,20 @@ import {
 import { getLoginUrl } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
 import { trpc } from "@/lib/trpc";
-import { 
-  LayoutDashboard, 
-  Calendar, 
-  BookOpen, 
-  CheckSquare, 
-  FileText, 
-  Settings, 
-  LogOut, 
+import {
+  LayoutDashboard,
+  Calendar,
+  BookOpen,
+  CheckSquare,
+  FileText,
+  Settings,
+  LogOut,
   PanelLeft,
-  GraduationCap
+  GraduationCap,
 } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState, useMemo } from "react";
 import { useLocation } from "wouter";
-import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
+import { DashboardLayoutSkeleton } from "./DashboardLayoutSkeleton";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 
@@ -60,7 +60,7 @@ export default function DashboardLayout({
   }, [sidebarWidth]);
 
   if (loading) {
-    return <DashboardLayoutSkeleton />
+    return <DashboardLayoutSkeleton />;
   }
 
   if (!user) {
@@ -75,7 +75,8 @@ export default function DashboardLayout({
               Welcome to Campass
             </h1>
             <p className="text-sm text-muted-foreground text-center max-w-sm">
-              Your personal academic dashboard for managing classes, tasks, and exams.
+              Your personal academic dashboard for managing classes, tasks, and
+              exams.
             </p>
           </div>
           <Button
@@ -130,7 +131,7 @@ function DashboardLayoutContent({
 
   // 未完了タスクの件数
   const pendingTasksCount = useMemo(() => {
-    return tasks?.filter(task => task.status !== 'completed').length || 0;
+    return tasks?.filter(task => task.status !== "completed").length || 0;
   }, [tasks]);
 
   // 2週間以内の試験の件数
@@ -138,22 +139,37 @@ function DashboardLayoutContent({
     const twoWeeksFromNow = new Date();
     twoWeeksFromNow.setDate(twoWeeksFromNow.getDate() + 14);
     const now = new Date();
-    
-    return exams?.filter(exam => {
-      const examDate = new Date(exam.examDate);
-      return examDate >= now && examDate <= twoWeeksFromNow;
-    }).length || 0;
+
+    return (
+      exams?.filter(exam => {
+        const examDate = new Date(exam.examDate);
+        return examDate >= now && examDate <= twoWeeksFromNow;
+      }).length || 0
+    );
   }, [exams]);
 
   // メニューアイテム（バッジ情報付き）
-  const menuItems = useMemo(() => [
-    { icon: LayoutDashboard, label: "Dashboard", path: "/", badge: null },
-    { icon: Calendar, label: "Calendar", path: "/calendar", badge: null },
-    { icon: BookOpen, label: "Classes", path: "/classes", badge: null },
-    { icon: CheckSquare, label: "Tasks", path: "/tasks", badge: pendingTasksCount > 0 ? pendingTasksCount : null },
-    { icon: FileText, label: "Exams", path: "/exams", badge: upcomingExamsCount > 0 ? upcomingExamsCount : null },
-    { icon: Settings, label: "Settings", path: "/settings", badge: null },
-  ], [pendingTasksCount, upcomingExamsCount]);
+  const menuItems = useMemo(
+    () => [
+      { icon: LayoutDashboard, label: "Dashboard", path: "/", badge: null },
+      { icon: Calendar, label: "Calendar", path: "/calendar", badge: null },
+      { icon: BookOpen, label: "Classes", path: "/classes", badge: null },
+      {
+        icon: CheckSquare,
+        label: "Tasks",
+        path: "/tasks",
+        badge: pendingTasksCount > 0 ? pendingTasksCount : null,
+      },
+      {
+        icon: FileText,
+        label: "Exams",
+        path: "/exams",
+        badge: upcomingExamsCount > 0 ? upcomingExamsCount : null,
+      },
+      { icon: Settings, label: "Settings", path: "/settings", badge: null },
+    ],
+    [pendingTasksCount, upcomingExamsCount]
+  );
 
   const activeMenuItem = menuItems.find(item => item.path === location);
 
@@ -201,15 +217,17 @@ function DashboardLayoutContent({
           className="border-r-0 bg-sidebar"
           disableTransition={isResizing}
         >
-          <SidebarHeader className="h-16 justify-center border-b border-sidebar-border">
-            <div className="flex items-center gap-3 px-2 transition-all w-full">
-              <button
-                onClick={toggleSidebar}
-                className="h-9 w-9 flex items-center justify-center hover:bg-sidebar-accent rounded-xl transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring shrink-0"
-                aria-label="Toggle navigation"
-              >
-                <PanelLeft className="h-4 w-4 text-sidebar-foreground/70" />
-              </button>
+          <SidebarHeader className="h-16 justify-center border-b border-sidebar-border py-2 px-0">
+            <div className="flex items-center gap-3 pr-3 transition-all w-full">
+              <div className="pl-3">
+                <button
+                  onClick={toggleSidebar}
+                  className="h-9 w-9 flex items-center justify-center hover:bg-sidebar-accent rounded-xl transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring shrink-0"
+                  aria-label="Toggle navigation"
+                >
+                  <PanelLeft className="h-4 w-4 text-sidebar-foreground/70" />
+                </button>
+              </div>
               {!isCollapsed ? (
                 <div className="flex items-center gap-2 min-w-0">
                   <GraduationCap className="h-5 w-5 text-sidebar-primary" />
@@ -221,7 +239,7 @@ function DashboardLayoutContent({
             </div>
           </SidebarHeader>
 
-          <SidebarContent className="gap-0 px-2 py-4">
+          <SidebarContent className="gap-0 px-3 py-4">
             <SidebarMenu>
               {menuItems.map(item => {
                 const isActive = location === item.path;
@@ -236,20 +254,20 @@ function DashboardLayoutContent({
                         }
                       }}
                       tooltip={item.label}
-                      className={`h-11 rounded-xl transition-all font-normal mb-1 ${
-                        isActive 
-                          ? "bg-sidebar-primary text-sidebar-primary-foreground hover:bg-sidebar-primary/90" 
-                          : "text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground"
+                      className={`h-10 rounded-lg transition-all font-normal mb-1 group-data-[collapsible=icon]:h-10 group-data-[collapsible=icon]:w-10 group-data-[collapsible=icon]:p-0 ${
+                        isActive
+                          ? "bg-sidebar-primary text-sidebar-primary-foreground hover:bg-sidebar-primary/90"
+                          : "text-sidebar-foreground/80 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
                       }`}
                     >
                       <item.icon className="h-4 w-4" />
                       <span className="flex-1">{item.label}</span>
                       {item.badge !== null && !isCollapsed && (
-                        <Badge 
-                          variant="secondary" 
+                        <Badge
+                          variant="secondary"
                           className={`ml-auto h-5 min-w-5 px-1.5 text-xs font-medium ${
-                            isActive 
-                              ? "bg-sidebar-primary-foreground/20 text-sidebar-primary-foreground" 
+                            isActive
+                              ? "bg-sidebar-primary-foreground/20 text-sidebar-primary-foreground"
                               : "bg-sidebar-accent text-sidebar-foreground"
                           }`}
                         >
@@ -263,24 +281,26 @@ function DashboardLayoutContent({
             </SidebarMenu>
           </SidebarContent>
 
-          <SidebarFooter className="p-3 border-t border-sidebar-border">
+          <SidebarFooter className="py-3 pr-3 border-t border-sidebar-border px-0">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="flex items-center gap-3 rounded-xl px-2 py-2 hover:bg-sidebar-accent transition-colors w-full text-left group-data-[collapsible=icon]:justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-ring">
-                  <Avatar className="h-9 w-9 border border-sidebar-border shrink-0">
-                    <AvatarFallback className="text-xs font-medium bg-sidebar-primary text-sidebar-primary-foreground">
-                      {user?.name?.charAt(0).toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1 min-w-0 group-data-[collapsible=icon]:hidden">
-                    <p className="text-sm font-medium truncate leading-none text-sidebar-foreground">
-                      {user?.name || "-"}
-                    </p>
-                    <p className="text-xs text-sidebar-foreground/60 truncate mt-1.5">
-                      {user?.email || "-"}
-                    </p>
-                  </div>
-                </button>
+                <div className="pl-3">
+                  <button className="flex items-center gap-3 rounded-lg transition-colors w-full text-left group-data-[collapsible=icon]:w-9 group-data-[collapsible=icon]:h-9 group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:rounded-full hover:bg-sidebar-accent/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                    <Avatar className="h-9 w-9 border border-sidebar-border shrink-0">
+                      <AvatarFallback className="text-xs font-medium bg-sidebar-primary text-sidebar-primary-foreground">
+                        {user?.name?.charAt(0).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1 min-w-0 group-data-[collapsible=icon]:hidden">
+                      <p className="text-sm font-medium truncate leading-none text-sidebar-foreground">
+                        {user?.name || "-"}
+                      </p>
+                      <p className="text-xs text-sidebar-foreground/60 truncate mt-1.5">
+                        {user?.email || "-"}
+                      </p>
+                    </div>
+                  </button>
+                </div>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
                 <DropdownMenuItem

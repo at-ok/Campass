@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { signUp, signIn } from "@/lib/auth-client";
+import { setAuthReturnTo } from "@/lib/auth-return-to";
 import { toast } from "sonner";
 import { Loader2, GraduationCap } from "lucide-react";
 
@@ -61,7 +62,7 @@ export default function Signup() {
     try {
       await signIn.social({
         provider: "google",
-        callbackURL: window.location.origin,
+        callbackURL: setAuthReturnTo(),
       });
     } catch {
       toast.error("Google サインアップに失敗しました");
@@ -70,7 +71,7 @@ export default function Signup() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+    <div className="auth-page min-h-dvh bg-background flex items-center justify-center p-4">
       <Card className="soft-card w-full max-w-md">
         <CardHeader className="text-center pb-2">
           <div className="flex justify-center mb-4">
