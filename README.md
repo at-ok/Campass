@@ -5,14 +5,15 @@ Campass is a comprehensive academic planner and scheduling application designed 
 ## Features
 
 - **Dashboard**: Overview of today's schedule, upcoming tasks, and quick stats.
-- **Timetable**: Manage weekly class schedules with period customization.
+- **Timetable**: Manage weekly class schedules with consecutive periods and weekend classes.
 - **Calendar**: Visual monthly/weekly view of all academic events.
 - **Task & Exam Management**: Track assignments and exams with status and deadlines.
 - **Responsive Design**: distinct mobile and desktop experiences.
 
 ## Tech Stack
 
-- **Frontend**: React, Vite, Tailwind CSS, Radix UI
+- **Frontend**: React 19, Vite, Material UI 9, Emotion
+- **Calendar & Forms**: FullCalendar, MUI X Date Pickers, React Hook Form, Zod
 - **Backend**: Hono, tRPC
 - **Database**: PostgreSQL (Neon), Drizzle ORM
 - **Authentication**: Better Auth
@@ -81,18 +82,27 @@ Campass is a comprehensive academic planner and scheduling application designed 
 
 ### Running the App
 
-Start the development server:
+Start the API and frontend in separate terminals:
 
 ```bash
-pnpm run dev
+pnpm run dev:server
+```
+
+```bash
+pnpm run dev:client
 ```
 
 The application will be available at `http://localhost:5173` (client) and `http://localhost:3000` (server).
 
 ## Scripts
 
-- `pnpm run dev`: Start both client and server in development mode
+- `pnpm run dev` / `dev:server`: Start the API in development mode
+- `pnpm run dev:client`: Start the frontend with the API proxy
 - `pnpm run build`: Build for production
 - `pnpm run start`: Start production server
 - `pnpm run check`: Type check
 - `pnpm run test`: Run tests
+
+## UI design
+
+The UI uses Material Design throughout, with Japanese labels, light/dark/system themes, responsive navigation, and shared editors. See [UI architecture and design decisions](docs/UI.md).

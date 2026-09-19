@@ -1,56 +1,50 @@
-import { describe, expect, it, vi, beforeEach } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { appRouter } from "./routers";
-import { COOKIE_NAME } from "../shared/const";
 import type { TrpcContext } from "./_core/context";
 
-type CookieCall = {
-  name: string;
-  options: Record<string, unknown>;
-};
+vi.mock("./auth", () => ({
+  auth: {
+    api: {
+      signOut: vi.fn().mockImplementation(
+        async () =>
+          new Response(null, {
+            headers: {
+              "set-cookie":
+                "better-auth.session_token=; Max-Age=0; Path=/; HttpOnly",
+            },
+          })
+      ),
+    },
+  },
+}));
 
-type AuthenticatedUser = NonNullable<TrpcContext["user"]>;
-
-function createAuthContext(): { ctx: TrpcContext; clearedCookies: CookieCall[] } {
-  const clearedCookies: CookieCall[] = [];
-
-  const user: AuthenticatedUser = {
-    id: 1,
-    openId: "test-user-123",
-    email: "test@example.com",
-    name: "Test User",
-    loginMethod: "manus",
-    role: "user",
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    lastSignedIn: new Date(),
-  };
-
-  const ctx: TrpcContext = {
-    user,
-    req: {
-      protocol: "https",
-      headers: {},
-    } as TrpcContext["req"],
-    res: {
-      clearCookie: (name: string, options: Record<string, unknown>) => {
-        clearedCookies.push({ name, options });
+function createAuthContext(): { ctx: TrpcContext } {
+  return {
+    ctx: {
+      user: {
+        id: "test-user-123",
+        email: "test@example.com",
+        name: "Test User",
+        role: "user",
+        emailVerified: true,
+        image: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
       },
-    } as TrpcContext["res"],
+      req: new Request("https://example.com/api/trpc", {
+        headers: { cookie: "better-auth.session_token=test" },
+      }),
+      resHeaders: new Headers(),
+      session: null,
+    },
   };
-
-  return { ctx, clearedCookies };
 }
-
 function createPublicContext(): TrpcContext {
   return {
     user: null,
-    req: {
-      protocol: "https",
-      headers: {},
-    } as TrpcContext["req"],
-    res: {
-      clearCookie: () => {},
-    } as TrpcContext["res"],
+    req: new Request("https://example.com/api/trpc"),
+    resHeaders: new Headers(),
+    session: null,
   };
 }
 
@@ -62,7 +56,7 @@ describe("auth.me", () => {
     const result = await caller.auth.me();
 
     expect(result).toBeDefined();
-    expect(result?.id).toBe(1);
+    expect(result?.id).toBe("test-user-123");
     expect(result?.email).toBe("test@example.com");
     expect(result?.name).toBe("Test User");
   });
@@ -78,22 +72,13 @@ describe("auth.me", () => {
 });
 
 describe("auth.logout", () => {
-  it("clears the session cookie and reports success", async () => {
-    const { ctx, clearedCookies } = createAuthContext();
-    const caller = appRouter.createCaller(ctx);
-
-    const result = await caller.auth.logout();
-
+  it("uses Better Auth to invalidate the session and forwards its cookie", async () => {
+    const { ctx } = createAuthContext();
+    const result = await appRouter.createCaller(ctx).auth.logout();
     expect(result).toEqual({ success: true });
-    expect(clearedCookies).toHaveLength(1);
-    expect(clearedCookies[0]?.name).toBe(COOKIE_NAME);
-    expect(clearedCookies[0]?.options).toMatchObject({
-      maxAge: -1,
-      secure: true,
-      sameSite: "none",
-      httpOnly: true,
-      path: "/",
-    });
+    expect(ctx.resHeaders.get("set-cookie")).toContain(
+      "better-auth.session_token=; Max-Age=0"
+    );
   });
 });
 
@@ -154,6 +139,27 @@ describe("dashboard", () => {
 });
 
 describe("classes", () => {
+  it("persists explicitly unset class schedules on create and update", async () => {
+    const { ctx } = createAuthContext();
+    const caller = appRouter.createCaller(ctx);
+    const db = await import("./db");
+    const data = {
+      name: "Unscheduled class",
+      dayOfWeek: null,
+      period: null,
+      periodCount: null,
+      startTime: null,
+      endTime: null,
+    };
+    await caller.classes.create(data);
+    expect(db.createClass).toHaveBeenLastCalledWith({
+      ...data,
+      userId: ctx.user!.id,
+    });
+    await caller.classes.update({ id: 1, ...data });
+    expect(db.updateClass).toHaveBeenLastCalledWith(1, ctx.user!.id, data);
+  });
+
   it("lists classes for authenticated user", async () => {
     const { ctx } = createAuthContext();
     const caller = appRouter.createCaller(ctx);
@@ -258,5 +264,43 @@ describe("events", () => {
     });
 
     expect(result).toEqual({ id: 1 });
+  });
+});
+
+describe("clearing optional editor fields", () => {
+  it("clears a task deadline and linked class without replacing them with an epoch date", async () => {
+    const db = await import("./db");
+    const { ctx } = createAuthContext();
+    await appRouter
+      .createCaller(ctx)
+      .tasks.update({ id: 7, dueDate: null, classId: null, description: "" });
+    expect(db.updateTask).toHaveBeenLastCalledWith(7, "test-user-123", {
+      dueDate: null,
+      classId: null,
+      description: "",
+    });
+  });
+  it("clears an event end date", async () => {
+    const db = await import("./db");
+    const { ctx } = createAuthContext();
+    await appRouter.createCaller(ctx).events.update({ id: 9, endDate: null });
+    expect(db.updateEvent).toHaveBeenLastCalledWith(9, "test-user-123", {
+      endDate: null,
+    });
+  });
+  it("rejects non-positive exam durations", async () => {
+    const { ctx } = createAuthContext();
+    await expect(
+      appRouter
+        .createCaller(ctx)
+        .exams.create({ title: "Exam", examDate: new Date(), duration: -10 })
+    ).rejects.toMatchObject({ code: "BAD_REQUEST" });
+  });
+  it("does not allow unauthenticated changes", async () => {
+    await expect(
+      appRouter
+        .createCaller(createPublicContext())
+        .tasks.create({ title: "Task" })
+    ).rejects.toMatchObject({ code: "UNAUTHORIZED" });
   });
 });

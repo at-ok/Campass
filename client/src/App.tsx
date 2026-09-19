@@ -1,56 +1,47 @@
-import { Toaster } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import NotFound from "@/pages/NotFound";
+import { lazy, Suspense } from "react";
 import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
-import DashboardLayout from "./components/DashboardLayout";
+const DashboardLayout = lazy(() => import("./components/DashboardLayout"));
 import { ThemeProvider } from "./contexts/ThemeContext";
-import Home from "./pages/Home";
-import CalendarPage from "./pages/Calendar";
-import ClassesPage from "./pages/Classes";
-import TasksPage from "./pages/Tasks";
-import ExamsPage from "./pages/Exams";
-import SettingsPage from "./pages/Settings";
-import Login from "./pages/Login";
-import Signup from "./pages/Signup";
-
-function Router() {
+import { FeedbackProvider } from "./components/material/Feedback";
+import { AppLoading } from "./components/material/Page";
+const Home = lazy(() => import("./pages/Home"));
+const Calendar = lazy(() => import("./pages/Calendar"));
+const Classes = lazy(() => import("./pages/Classes"));
+const Tasks = lazy(() => import("./pages/Tasks"));
+const Exams = lazy(() => import("./pages/Exams"));
+const Settings = lazy(() => import("./pages/Settings"));
+const Login = lazy(() => import("./pages/Login"));
+const Signup = lazy(() => import("./pages/Signup"));
+const NotFound = lazy(() => import("./pages/NotFound"));
+export default function App() {
   return (
-    <Switch>
-      {/* Auth routes - outside DashboardLayout */}
-      <Route path="/login" component={Login} />
-      <Route path="/signup" component={Signup} />
-
-      {/* Dashboard routes */}
-      <Route>
-        <DashboardLayout>
-          <Switch>
-            <Route path="/" component={Home} />
-            <Route path="/calendar" component={CalendarPage} />
-            <Route path="/classes" component={ClassesPage} />
-            <Route path="/tasks" component={TasksPage} />
-            <Route path="/exams" component={ExamsPage} />
-            <Route path="/settings" component={SettingsPage} />
-            <Route path="/404" component={NotFound} />
-            <Route component={NotFound} />
-          </Switch>
-        </DashboardLayout>
-      </Route>
-    </Switch>
+    <ThemeProvider>
+      <ErrorBoundary>
+        <FeedbackProvider>
+          <Suspense fallback={<AppLoading />}>
+            <Switch>
+              <Route path="/login" component={Login} />
+              <Route path="/signup" component={Signup} />
+              <Route>
+                <DashboardLayout>
+                  <Suspense fallback={<AppLoading />}>
+                    <Switch>
+                      <Route path="/" component={Home} />
+                      <Route path="/calendar" component={Calendar} />
+                      <Route path="/classes" component={Classes} />
+                      <Route path="/tasks" component={Tasks} />
+                      <Route path="/exams" component={Exams} />
+                      <Route path="/settings" component={Settings} />
+                      <Route component={NotFound} />
+                    </Switch>
+                  </Suspense>
+                </DashboardLayout>
+              </Route>
+            </Switch>
+          </Suspense>
+        </FeedbackProvider>
+      </ErrorBoundary>
+    </ThemeProvider>
   );
 }
-
-function App() {
-  return (
-    <ErrorBoundary>
-      <ThemeProvider defaultTheme="light" switchable>
-        <TooltipProvider>
-          <Toaster />
-          <Router />
-        </TooltipProvider>
-      </ThemeProvider>
-    </ErrorBoundary>
-  );
-}
-
-export default App;

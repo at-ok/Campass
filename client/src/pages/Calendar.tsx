@@ -1,273 +1,142 @@
-import { useState, useMemo } from "react";
+import { useMemo, useState } from "react";
+import { Box, Chip, Stack } from "@mui/material";
+import { addMinutes } from "date-fns";
+import type { EventInput } from "@fullcalendar/core";
 import { trpc } from "@/lib/trpc";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
-import FullCalendar from "@fullcalendar/react";
-import dayGridPlugin from "@fullcalendar/daygrid";
-import timeGridPlugin from "@fullcalendar/timegrid";
-import interactionPlugin from "@fullcalendar/interaction";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { toast } from "sonner";
-import { format } from "date-fns";
-
-const colorMap: Record<string, string> = {
-  pink: "oklch(0.85 0.08 0)",
-  yellow: "oklch(0.88 0.08 90)",
-  blue: "oklch(0.8 0.08 240)",
-  green: "oklch(0.85 0.08 145)",
-  purple: "oklch(0.82 0.08 300)",
-};
-
+import { classEvents, getColor } from "@/lib/planner";
+import { useTheme } from "@/contexts/ThemeContext";
+import {
+  usePlannerEditor,
+  type EditorRequest,
+} from "@/components/material/PlannerEditor";
+import {
+  AddButton,
+  PageHeading,
+  PageLoading,
+  QueryError,
+} from "@/components/material/Page";
+import { ScheduleCalendar } from "@/components/material/ScheduleCalendar";
+const filters = [
+  { kind: "class", label: "授業", color: "blue" },
+  { kind: "task", label: "課題", color: "yellow" },
+  { kind: "exam", label: "試験", color: "pink" },
+  { kind: "event", label: "予定", color: "green" },
+];
 export default function CalendarPage() {
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [newEvent, setNewEvent] = useState<{
-    title: string;
-    startDate: string;
-    endDate: string;
-    eventType: "class" | "task" | "exam" | "reminder" | "other";
-    color: string;
-  }>({
-    title: "",
-    startDate: "",
-    endDate: "",
-    eventType: "other",
-    color: "blue",
-  });
-
-  const utils = trpc.useUtils();
-  const { data: events } = trpc.events.list.useQuery();
-  const { data: tasks } = trpc.tasks.list.useQuery();
-  const { data: exams } = trpc.exams.list.useQuery();
-
-  const createEvent = trpc.events.create.useMutation({
-    onSuccess: () => {
-      utils.events.list.invalidate();
-      setIsDialogOpen(false);
-      setNewEvent({ title: "", startDate: "", endDate: "", eventType: "other", color: "blue" });
-      toast.success("Event created successfully");
-    },
-    onError: () => {
-      toast.error("Failed to create event");
-    },
-  });
-
+  const events = trpc.events.list.useQuery();
+  const classes = trpc.classes.list.useQuery();
+  const tasks = trpc.tasks.list.useQuery();
+  const exams = trpc.exams.list.useQuery();
+  const { theme } = useTheme();
+  const edit = usePlannerEditor();
+  const [visible, setVisible] = useState(["class", "task", "exam", "event"]);
   const calendarEvents = useMemo(() => {
-    const allEvents: Array<{
-      id: string;
-      title: string;
-      start: Date;
-      end?: Date;
-      backgroundColor: string;
-      borderColor: string;
-      textColor: string;
-    }> = [];
-
-    events?.forEach((event) => {
-      allEvents.push({
-        id: `event-${event.id}`,
-        title: event.title,
-        start: new Date(event.startDate),
-        end: event.endDate ? new Date(event.endDate) : undefined,
-        backgroundColor: colorMap[event.color || "purple"] || colorMap.purple,
-        borderColor: "transparent",
-        textColor: "oklch(0.25 0.02 250)",
-      });
-    });
-
-    tasks?.forEach((task) => {
-      if (task.dueDate) {
-        allEvents.push({
-          id: `task-${task.id}`,
-          title: `📋 ${task.title}`,
-          start: new Date(task.dueDate),
-          backgroundColor: colorMap[task.color || "yellow"] || colorMap.yellow,
-          borderColor: "transparent",
-          textColor: "oklch(0.25 0.02 250)",
-        });
-      }
-    });
-
-    exams?.forEach((exam) => {
-      allEvents.push({
-        id: `exam-${exam.id}`,
-        title: `📝 ${exam.title}`,
-        start: new Date(exam.examDate),
-        backgroundColor: colorMap[exam.color || "pink"] || colorMap.pink,
-        borderColor: "transparent",
-        textColor: "oklch(0.25 0.02 250)",
-      });
-    });
-
-    return allEvents;
-  }, [events, tasks, exams]);
-
-  const handleDateClick = (arg: { date: Date; dateStr: string }) => {
-    // Set start date to clicked date at 9:00 AM
-    const startDate = new Date(arg.date);
-    startDate.setHours(9, 0, 0, 0);
-    
-    // Set end date to clicked date at 10:00 AM (1 hour later)
-    const endDate = new Date(arg.date);
-    endDate.setHours(10, 0, 0, 0);
-    
-    setNewEvent((prev) => ({
-      ...prev,
-      startDate: format(startDate, "yyyy-MM-dd'T'HH:mm"),
-      endDate: format(endDate, "yyyy-MM-dd'T'HH:mm"),
-    }));
-    setIsDialogOpen(true);
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newEvent.title || !newEvent.startDate) {
-      toast.error("Please fill in required fields");
-      return;
-    }
-    createEvent.mutate({
-      title: newEvent.title,
-      startDate: new Date(newEvent.startDate),
-      endDate: newEvent.endDate ? new Date(newEvent.endDate) : undefined,
-      eventType: newEvent.eventType,
-      color: newEvent.color,
-    });
-  };
-
+    const paint = (color: string | null) => {
+      const palette = getColor(color);
+      return {
+        backgroundColor: theme === "dark" ? palette.dark : palette.light,
+        textColor: theme === "dark" ? palette.light : palette.ink,
+        borderColor: palette.main,
+      };
+    };
+    const result: EventInput[] = [
+      ...classEvents(classes.data ?? [], theme === "dark"),
+      ...(events.data ?? []).map(record => ({
+        id: `event-${record.id}`,
+        title: record.title,
+        start: new Date(record.startDate),
+        end: record.endDate ? new Date(record.endDate) : undefined,
+        allDay: record.allDay ?? false,
+        ...paint(record.color),
+        extendedProps: { kind: "event", record },
+      })),
+      ...(tasks.data ?? [])
+        .filter(record => record.dueDate && record.status !== "completed")
+        .map(record => ({
+          id: `task-${record.id}`,
+          title: `提出 · ${record.title}`,
+          start: new Date(record.dueDate!),
+          ...paint(record.color),
+          extendedProps: { kind: "task", record },
+        })),
+      ...(exams.data ?? [])
+        .filter(record => record.status !== "cancelled")
+        .map(record => ({
+          id: `exam-${record.id}`,
+          title: `試験 · ${record.title}`,
+          start: new Date(record.examDate),
+          end: record.duration
+            ? addMinutes(new Date(record.examDate), record.duration)
+            : undefined,
+          ...paint(record.color),
+          extendedProps: { kind: "exam", record },
+        })),
+    ];
+    return result.filter(event => visible.includes(event.extendedProps!.kind));
+  }, [classes.data, tasks.data, exams.data, events.data, theme, visible]);
+  const queries = [events, classes, tasks, exams];
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">Calendar</h1>
-          <p className="text-muted-foreground">
-            View and manage your schedule, tasks, and exams.
-          </p>
-        </div>
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogTrigger asChild>
-            <Button className="rounded-xl">
-              <Plus className="h-4 w-4 mr-2" />
-              Add Event
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-md">
-            <DialogHeader>
-              <DialogTitle>Create New Event</DialogTitle>
-            </DialogHeader>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="title">Title</Label>
-                <Input
-                  id="title"
-                  value={newEvent.title}
-                  onChange={(e) => setNewEvent((prev) => ({ ...prev, title: e.target.value }))}
-                  placeholder="Event title"
-                  className="rounded-xl"
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="startDate">Start Date</Label>
-                  <Input
-                    id="startDate"
-                    type="datetime-local"
-                    value={newEvent.startDate}
-                    onChange={(e) => setNewEvent((prev) => ({ ...prev, startDate: e.target.value }))}
-                    className="rounded-xl"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="endDate">End Date</Label>
-                  <Input
-                    id="endDate"
-                    type="datetime-local"
-                    value={newEvent.endDate}
-                    onChange={(e) => setNewEvent((prev) => ({ ...prev, endDate: e.target.value }))}
-                    className="rounded-xl"
-                  />
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label>Event Type</Label>
-                  <Select
-                    value={newEvent.eventType}
-                    onValueChange={(value: "class" | "task" | "exam" | "reminder" | "other") =>
-                      setNewEvent((prev) => ({ ...prev, eventType: value }))
-                    }
-                  >
-                    <SelectTrigger className="rounded-xl">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="class">Class</SelectItem>
-                      <SelectItem value="task">Task</SelectItem>
-                      <SelectItem value="exam">Exam</SelectItem>
-                      <SelectItem value="reminder">Reminder</SelectItem>
-                      <SelectItem value="other">Other</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label>Color</Label>
-                  <Select
-                    value={newEvent.color}
-                    onValueChange={(value) => setNewEvent((prev) => ({ ...prev, color: value }))}
-                  >
-                    <SelectTrigger className="rounded-xl">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="pink">Pink</SelectItem>
-                      <SelectItem value="yellow">Yellow</SelectItem>
-                      <SelectItem value="blue">Blue</SelectItem>
-                      <SelectItem value="green">Green</SelectItem>
-                      <SelectItem value="purple">Purple</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-              <div className="flex justify-end gap-2 pt-4">
-                <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)} className="rounded-xl">
-                  Cancel
-                </Button>
-                <Button type="submit" className="rounded-xl" disabled={createEvent.isPending}>
-                  {createEvent.isPending ? "Creating..." : "Create Event"}
-                </Button>
-              </div>
-            </form>
-          </DialogContent>
-        </Dialog>
-      </div>
-
-      {/* Calendar */}
-      <Card className="soft-card calendar-container">
-        <CardContent className="p-4 md:p-6">
-          <FullCalendar
-            plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-            initialView="dayGridMonth"
-            headerToolbar={{
-              left: "prev,next today",
-              center: "title",
-              right: "dayGridMonth,timeGridWeek,timeGridDay",
-            }}
-            events={calendarEvents}
-            dateClick={handleDateClick}
-            eventClick={(info) => {
-              toast.info(`Event: ${info.event.title}`);
-            }}
-            height="auto"
-            aspectRatio={1.8}
-            dayMaxEvents={3}
-            eventDisplay="block"
-            eventClassNames="cursor-pointer"
+    <>
+      <PageHeading
+        title="カレンダー"
+        description="授業も締め切りも、ひと目でわかる。"
+        action={
+          <AddButton onClick={() => edit({ kind: "event" })}>
+            予定を追加
+          </AddButton>
+        }
+      />
+      <Stack
+        direction="row"
+        aria-label="表示する予定"
+        sx={{ gap: 1, mb: 2.5, flexWrap: "wrap" }}
+      >
+        {filters.map(filter => (
+          <Chip
+            key={filter.kind}
+            label={filter.label}
+            onClick={() =>
+              setVisible(prev =>
+                prev.includes(filter.kind)
+                  ? prev.filter(kind => kind !== filter.kind)
+                  : [...prev, filter.kind]
+              )
+            }
+            aria-pressed={visible.includes(filter.kind)}
+            variant={visible.includes(filter.kind) ? "filled" : "outlined"}
+            icon={
+              <Box
+                component="span"
+                sx={{
+                  width: "10px !important",
+                  height: 10,
+                  borderRadius: "50%",
+                  bgcolor: getColor(filter.color).main,
+                  ml: "12px !important",
+                }}
+              />
+            }
+            sx={{ px: 0.5, opacity: visible.includes(filter.kind) ? 1 : 0.65 }}
           />
-        </CardContent>
-      </Card>
-    </div>
+        ))}
+      </Stack>
+      {queries.some(query => query.isError) ? (
+        <QueryError
+          retry={() => queries.forEach(query => void query.refetch())}
+        />
+      ) : queries.some(query => query.isLoading) ? (
+        <PageLoading />
+      ) : (
+        <ScheduleCalendar
+          events={calendarEvents}
+          onDateClick={arg => {
+            const date = new Date(arg.date);
+            if (arg.allDay) date.setHours(9);
+            edit({ kind: "event", date });
+          }}
+          onEventClick={arg => edit(arg.event.extendedProps as EditorRequest)}
+        />
+      )}
+    </>
   );
 }

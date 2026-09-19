@@ -1,62 +1,52 @@
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { appRouter } from "./routers";
-import { COOKIE_NAME } from "../shared/const";
+import { auth } from "./auth";
 import type { TrpcContext } from "./_core/context";
-
-type CookieCall = {
-  name: string;
-  options: Record<string, unknown>;
-};
-
-type AuthenticatedUser = NonNullable<TrpcContext["user"]>;
-
-function createAuthContext(): { ctx: TrpcContext; clearedCookies: CookieCall[] } {
-  const clearedCookies: CookieCall[] = [];
-
-  const user: AuthenticatedUser = {
-    id: 1,
-    openId: "sample-user",
-    email: "sample@example.com",
-    name: "Sample User",
-    loginMethod: "manus",
-    role: "user",
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    lastSignedIn: new Date(),
+vi.mock("./db", () => ({}));
+vi.mock("./auth", () => ({ auth: { api: { signOut: vi.fn() } } }));
+function context(): TrpcContext {
+  return {
+    req: new Request("https://example.com/api/trpc", {
+      headers: { cookie: "better-auth.session_token=test-session" },
+    }),
+    resHeaders: new Headers(),
+    user: null,
+    session: null,
   };
-
-  const ctx: TrpcContext = {
-    user,
-    req: {
-      protocol: "https",
-      headers: {},
-    } as TrpcContext["req"],
-    res: {
-      clearCookie: (name: string, options: Record<string, unknown>) => {
-        clearedCookies.push({ name, options });
-      },
-    } as TrpcContext["res"],
-  };
-
-  return { ctx, clearedCookies };
 }
-
-describe("auth.logout", () => {
-  it("clears the session cookie and reports success", async () => {
-    const { ctx, clearedCookies } = createAuthContext();
-    const caller = appRouter.createCaller(ctx);
-
-    const result = await caller.auth.logout();
-
-    expect(result).toEqual({ success: true });
-    expect(clearedCookies).toHaveLength(1);
-    expect(clearedCookies[0]?.name).toBe(COOKIE_NAME);
-    expect(clearedCookies[0]?.options).toMatchObject({
-      maxAge: -1,
-      secure: true,
-      sameSite: "none",
-      httpOnly: true,
-      path: "/",
+describe("Better Auth logout", () => {
+  beforeEach(() => vi.resetAllMocks());
+  it("passes the session to Better Auth and forwards every cleared cookie", async () => {
+    const response = new Response(null);
+    response.headers.append(
+      "set-cookie",
+      "better-auth.session_token=; Max-Age=0; HttpOnly; Path=/"
+    );
+    response.headers.append(
+      "set-cookie",
+      "better-auth.session_data=; Max-Age=0; HttpOnly; Path=/"
+    );
+    vi.mocked(auth.api.signOut).mockResolvedValue(response as never);
+    const ctx = context();
+    expect(await appRouter.createCaller(ctx).auth.logout()).toEqual({
+      success: true,
     });
+    expect(auth.api.signOut).toHaveBeenCalledWith({
+      headers: ctx.req.headers,
+      asResponse: true,
+    });
+    expect(ctx.resHeaders.getSetCookie()).toEqual(
+      response.headers.getSetCookie()
+    );
+  });
+  it("does not report success when session invalidation fails", async () => {
+    vi.mocked(auth.api.signOut).mockRejectedValue(
+      new Error("Session store unavailable")
+    );
+    const ctx = context();
+    await expect(appRouter.createCaller(ctx).auth.logout()).rejects.toThrow(
+      "Session store unavailable"
+    );
+    expect(ctx.resHeaders.getSetCookie()).toHaveLength(0);
   });
 });

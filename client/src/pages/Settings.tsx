@@ -1,152 +1,142 @@
+import {
+  Avatar,
+  Box,
+  Button,
+  Divider,
+  FormControl,
+  FormControlLabel,
+  FormLabel,
+  Paper,
+  Radio,
+  RadioGroup,
+  Stack,
+  Switch,
+  Typography,
+} from "@mui/material";
+import LogoutRounded from "@mui/icons-material/LogoutRounded";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { useTheme } from "@/contexts/ThemeContext";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { User, Moon, Sun, LogOut, Bell, Shield } from "lucide-react";
-import { toast } from "sonner";
-
+import { PageHeading } from "@/components/material/Page";
+import { useFeedback } from "@/components/material/Feedback";
 export default function SettingsPage() {
   const { user, logout } = useAuth();
-  const { theme, toggleTheme } = useTheme();
-
-  const handleLogout = async () => {
-    await logout();
-    toast.success("Logged out successfully");
-  };
-
+  const { mode, setMode, weekends, setWeekends } = useTheme();
+  const notify = useFeedback();
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">Settings</h1>
-        <p className="text-muted-foreground">Manage your account and preferences.</p>
-      </div>
-
-      <div className="grid gap-6 lg:grid-cols-2">
-        {/* Profile Section */}
-        <Card className="soft-card">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-lg">
-              <User className="h-5 w-5 text-primary" />
-              Profile
-            </CardTitle>
-            <CardDescription>Your account information</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center gap-4">
-              <Avatar className="h-16 w-16">
-                <AvatarFallback className="text-xl bg-primary text-primary-foreground">
-                  {user?.name?.charAt(0).toUpperCase() || "U"}
-                </AvatarFallback>
-              </Avatar>
-              <div>
-                <h3 className="font-semibold text-lg">{user?.name || "User"}</h3>
-                <p className="text-sm text-muted-foreground">{user?.email || "No email"}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Appearance Section */}
-        <Card className="soft-card">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-lg">
-              {theme === "dark" ? <Moon className="h-5 w-5 text-primary" /> : <Sun className="h-5 w-5 text-primary" />}
-              Appearance
-            </CardTitle>
-            <CardDescription>Customize how Campass looks</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <Label htmlFor="dark-mode" className="text-base">Dark Mode</Label>
-                <p className="text-sm text-muted-foreground">
-                  Switch between light and dark themes
-                </p>
-              </div>
-              <Switch
-                id="dark-mode"
-                checked={theme === "dark"}
-                onCheckedChange={toggleTheme}
+    <Box sx={{ maxWidth: 840 }}>
+      <PageHeading
+        title="設定"
+        description="使いやすさを、あなたに合わせて。"
+      />
+      <Paper variant="outlined" sx={{ overflow: "hidden" }}>
+        <Box sx={{ p: { xs: 2.5, sm: 4 } }}>
+          <Typography variant="h6" sx={{ mb: 2.5 }}>
+            アカウント
+          </Typography>
+          <Stack direction="row" sx={{ gap: 2, alignItems: "center" }}>
+            <Avatar
+              src={user?.image ?? undefined}
+              sx={{
+                width: 56,
+                height: 56,
+                bgcolor: "action.selected",
+                color: "primary.main",
+              }}
+            >
+              {user?.name?.slice(0, 1)}
+            </Avatar>
+            <Box sx={{ minWidth: 0 }}>
+              <Typography sx={{ fontWeight: 500 }}>{user?.name}</Typography>
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ overflowWrap: "anywhere" }}
+              >
+                {user?.email}
+              </Typography>
+            </Box>
+          </Stack>
+        </Box>
+        <Divider />
+        <Box sx={{ p: { xs: 2.5, sm: 4 } }}>
+          <FormControl>
+            <FormLabel
+              id="theme-label"
+              sx={{ color: "text.primary", fontWeight: 500, mb: 1 }}
+            >
+              表示モード
+            </FormLabel>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5 }}>
+              見やすい明るさを選んでください。
+            </Typography>
+            <RadioGroup
+              aria-labelledby="theme-label"
+              value={mode}
+              onChange={(_, value) => setMode(value as typeof mode)}
+            >
+              <FormControlLabel
+                value="system"
+                control={<Radio />}
+                label="デバイスの設定に合わせる"
               />
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Notifications Section */}
-        <Card className="soft-card">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-lg">
-              <Bell className="h-5 w-5 text-primary" />
-              Notifications
-            </CardTitle>
-            <CardDescription>Manage your notification preferences</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <Label htmlFor="task-reminders" className="text-base">Task Reminders</Label>
-                <p className="text-sm text-muted-foreground">
-                  Get notified about upcoming task deadlines
-                </p>
-              </div>
-              <Switch id="task-reminders" defaultChecked />
-            </div>
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <Label htmlFor="exam-reminders" className="text-base">Exam Reminders</Label>
-                <p className="text-sm text-muted-foreground">
-                  Get notified about upcoming exams
-                </p>
-              </div>
-              <Switch id="exam-reminders" defaultChecked />
-            </div>
-            <p className="text-xs text-muted-foreground pt-2">
-              Note: Notification settings are stored locally. Full notification support coming soon.
-            </p>
-          </CardContent>
-        </Card>
-
-        {/* Privacy Section */}
-        <Card className="soft-card">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-lg">
-              <Shield className="h-5 w-5 text-primary" />
-              Privacy & Security
-            </CardTitle>
-            <CardDescription>Manage your data and security settings</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <p className="text-sm text-muted-foreground">
-              Your data is stored securely and is only accessible by you. We use industry-standard encryption to protect your information.
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Logout Section */}
-      <Card className="soft-card border-destructive/20">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-lg text-destructive">
-            <LogOut className="h-5 w-5" />
-            Sign Out
-          </CardTitle>
-          <CardDescription>Sign out of your account</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Button
-            variant="destructive"
-            onClick={handleLogout}
-            className="rounded-xl"
-          >
-            <LogOut className="h-4 w-4 mr-2" />
-            Sign Out
-          </Button>
-        </CardContent>
-      </Card>
-    </div>
+              <FormControlLabel
+                value="light"
+                control={<Radio />}
+                label="ライト"
+              />
+              <FormControlLabel
+                value="dark"
+                control={<Radio />}
+                label="ダーク"
+              />
+            </RadioGroup>
+          </FormControl>
+        </Box>
+        <Divider />
+        <Box sx={{ p: { xs: 2.5, sm: 4 } }}>
+          <Typography variant="h6" sx={{ mb: 1.5 }}>
+            時間割の表示
+          </Typography>
+          <FormControlLabel
+            label="土曜日・日曜日を表示する"
+            control={
+              <Switch
+                checked={weekends}
+                onChange={(_, checked) => setWeekends(checked)}
+              />
+            }
+          />
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+            週末に授業がある場合は、この設定にかかわらず表示します。
+          </Typography>
+        </Box>
+        <Divider />
+        <Box sx={{ p: { xs: 2.5, sm: 4 } }}>
+          <Typography variant="h6" sx={{ mb: 1 }}>
+            このアプリについて
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Campass — 時間割、課題、試験をまとめて管理する学習プランナー。
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+            表示設定は、このブラウザーに保存されます。
+          </Typography>
+        </Box>
+      </Paper>
+      <Button
+        color="error"
+        startIcon={<LogoutRounded />}
+        onClick={async () => {
+          try {
+            await logout();
+          } catch {
+            notify("ログアウトできませんでした", "error");
+          }
+        }}
+        sx={{ mt: 3 }}
+      >
+        ログアウト
+      </Button>
+    </Box>
   );
 }

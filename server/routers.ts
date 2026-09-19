@@ -2,14 +2,27 @@ import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { z } from "zod";
 import * as db from "./db";
+import { auth } from "./auth";
+import { TRPCError } from "@trpc/server";
 
 export const appRouter = router({
   system: systemRouter,
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
     logout: publicProcedure.mutation(async ({ ctx }) => {
-      // With Better Auth, signout is typically handled by the client hitting /api/auth/signout
-      // But we can facilitate it here if needed, or just return success.
+      const response = await auth.api.signOut({
+        headers: ctx.req.headers,
+        asResponse: true,
+      });
+      if (!response.ok) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "ログアウトできませんでした",
+        });
+      }
+      for (const cookie of response.headers.getSetCookie()) {
+        ctx.resHeaders.append("set-cookie", cookie);
+      }
       return { success: true };
     }),
   }),
@@ -40,11 +53,11 @@ export const appRouter = router({
               "saturday",
               "sunday",
             ])
-            .optional(),
-          period: z.number().min(1).max(5).optional(),
-          periodCount: z.number().min(1).max(2).optional(),
-          startTime: z.string().optional(),
-          endTime: z.string().optional(),
+            .nullish(),
+          period: z.number().min(1).max(5).nullish(),
+          periodCount: z.number().min(1).max(2).nullish(),
+          startTime: z.string().nullish(),
+          endTime: z.string().nullish(),
           color: z.string().optional(),
         })
       )
@@ -68,11 +81,11 @@ export const appRouter = router({
               "saturday",
               "sunday",
             ])
-            .optional(),
-          period: z.number().min(1).max(5).optional(),
-          periodCount: z.number().min(1).max(2).optional(),
-          startTime: z.string().optional(),
-          endTime: z.string().optional(),
+            .nullish(),
+          period: z.number().min(1).max(5).nullish(),
+          periodCount: z.number().min(1).max(2).nullish(),
+          startTime: z.string().nullish(),
+          endTime: z.string().nullish(),
           color: z.string().optional(),
         })
       )
@@ -104,8 +117,8 @@ export const appRouter = router({
         z.object({
           title: z.string().min(1),
           description: z.string().optional(),
-          classId: z.number().optional(),
-          dueDate: z.coerce.date().optional(), // coerce date strings if needed
+          classId: z.number().nullable().optional(),
+          dueDate: z.coerce.date().nullable().optional(), // coerce date strings if needed
           priority: z.enum(["low", "medium", "high"]).optional(),
           status: z.enum(["pending", "in_progress", "completed"]).optional(),
           color: z.string().optional(),
@@ -120,8 +133,8 @@ export const appRouter = router({
           id: z.number(),
           title: z.string().min(1).optional(),
           description: z.string().optional(),
-          classId: z.number().optional(),
-          dueDate: z.coerce.date().optional(),
+          classId: z.number().nullable().optional(),
+          dueDate: z.coerce.date().nullable().optional(),
           priority: z.enum(["low", "medium", "high"]).optional(),
           status: z.enum(["pending", "in_progress", "completed"]).optional(),
           color: z.string().optional(),
@@ -166,9 +179,9 @@ export const appRouter = router({
         z.object({
           title: z.string().min(1),
           description: z.string().optional(),
-          classId: z.number().optional(),
+          classId: z.number().nullable().optional(),
           examDate: z.coerce.date(),
-          duration: z.number().optional(),
+          duration: z.number().int().positive().nullable().optional(),
           room: z.string().optional(),
           status: z
             .enum(["scheduled", "confirmed", "completed", "cancelled"])
@@ -185,9 +198,9 @@ export const appRouter = router({
           id: z.number(),
           title: z.string().min(1).optional(),
           description: z.string().optional(),
-          classId: z.number().optional(),
+          classId: z.number().nullable().optional(),
           examDate: z.coerce.date().optional(),
-          duration: z.number().optional(),
+          duration: z.number().int().positive().nullable().optional(),
           room: z.string().optional(),
           status: z
             .enum(["scheduled", "confirmed", "completed", "cancelled"])
@@ -233,7 +246,7 @@ export const appRouter = router({
           title: z.string().min(1),
           description: z.string().optional(),
           startDate: z.coerce.date(),
-          endDate: z.coerce.date().optional(),
+          endDate: z.coerce.date().nullable().optional(),
           allDay: z.boolean().optional(),
           eventType: z
             .enum(["class", "task", "exam", "reminder", "other"])
@@ -251,7 +264,7 @@ export const appRouter = router({
           title: z.string().min(1).optional(),
           description: z.string().optional(),
           startDate: z.coerce.date().optional(),
-          endDate: z.coerce.date().optional(),
+          endDate: z.coerce.date().nullable().optional(),
           allDay: z.boolean().optional(),
           eventType: z
             .enum(["class", "task", "exam", "reminder", "other"])
