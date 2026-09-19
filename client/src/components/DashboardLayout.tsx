@@ -193,7 +193,8 @@ function Shell({ children }: { children: ReactNode }) {
   const navContent = (
     <Box
       sx={{
-        height: "100%",
+        minHeight: "100%",
+        flexShrink: 0,
         display: "flex",
         flexDirection: "column",
         px: 1.5,
@@ -260,7 +261,7 @@ function Shell({ children }: { children: ReactNode }) {
         ))}
       </List>
       <Divider sx={{ my: 2, mx: 1 }} />
-      <Box sx={{ display: { xs: "none", md: "block" }, mx: -0.5 }}>
+      <Box sx={{ display: { xs: "none", md: "block" }, minWidth: 0 }}>
         <DateCalendar
           value={date}
           onChange={value => {
@@ -271,11 +272,13 @@ function Shell({ children }: { children: ReactNode }) {
           }}
           showDaysOutsideCurrentMonth
           sx={{
-            width: 216,
+            width: "100%",
             height: 280,
             "& .MuiDayCalendar-weekDayLabel, & .MuiPickerDay-root": {
-              width: 27,
-              height: 30,
+              "--PickerDay-size": "26px",
+              "--PickerDay-horizontalMargin": "1px",
+              width: 26,
+              height: 26,
               mx: "1px",
               fontSize: 11,
             },
@@ -306,13 +309,6 @@ function Shell({ children }: { children: ReactNode }) {
           slotProps={{ primary: { sx: { fontSize: 14 } } }}
         />
       </ListItemButton>
-      <Typography
-        variant="caption"
-        color="text.secondary"
-        sx={{ px: 2, pb: 3 }}
-      >
-        毎日に、学びの余白を。
-      </Typography>
     </Box>
   );
   return (
@@ -411,6 +407,8 @@ function Shell({ children }: { children: ReactNode }) {
             height: "calc(100% - 80px)",
             bgcolor: "background.default",
             border: 0,
+            borderRadius: 0,
+            overflowX: "hidden",
           },
         }}
       >

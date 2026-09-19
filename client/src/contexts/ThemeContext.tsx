@@ -112,6 +112,22 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
                 root: { backgroundImage: "none", borderRadius: 16 },
               },
             },
+            MuiAlert: {
+              styleOverrides: {
+                root: {
+                  alignItems: "center",
+                  padding: "12px 16px",
+                  borderRadius: 12,
+                },
+                icon: { alignItems: "center", padding: 0, marginRight: 12 },
+                message: { padding: 0, minWidth: 0, overflowWrap: "anywhere" },
+                action: {
+                  alignItems: "center",
+                  padding: "0 0 0 16px",
+                  marginRight: 0,
+                },
+              },
+            },
             MuiAppBar: { styleOverrides: { root: { borderRadius: 0 } } },
             MuiDialog: {
               styleOverrides: {

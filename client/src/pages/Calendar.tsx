@@ -79,7 +79,6 @@ export default function CalendarPage() {
     <>
       <PageHeading
         title="カレンダー"
-        description="授業も締め切りも、ひと目でわかる。"
         action={
           <AddButton onClick={() => edit({ kind: "event" })}>
             予定を追加

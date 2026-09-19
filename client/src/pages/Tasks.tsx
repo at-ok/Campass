@@ -61,7 +61,6 @@ export default function TasksPage() {
     <>
       <PageHeading
         title="課題"
-        description="やることを整理して、ひとつずつ前へ。"
         action={
           <AddButton onClick={() => edit({ kind: "task" })}>
             課題を追加
@@ -245,12 +244,9 @@ export default function TasksPage() {
             title={
               filter === "completed"
                 ? "完了した課題はまだありません"
-                : "すべて片付いています"
-            }
-            description={
-              filter === "completed"
-                ? "チェックを入れた課題がここに表示されます。"
-                : "次の課題を追加して、締め切りまでの見通しを立てましょう。"
+                : filter === "all"
+                  ? "課題はありません"
+                  : "未完了の課題はありません"
             }
             action={
               <AddButton onClick={() => edit({ kind: "task" })}>

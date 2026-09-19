@@ -63,7 +63,7 @@ export function EmptyState({
   action,
 }: {
   title: string;
-  description: string;
+  description?: string;
   action?: ReactNode;
 }) {
   return (
@@ -86,9 +86,11 @@ export function EmptyState({
         <EventNoteRounded sx={{ fontSize: 34 }} />
       </Box>
       <Typography variant="h6">{title}</Typography>
-      <Typography color="text.secondary" sx={{ maxWidth: 380, pb: 1 }}>
-        {description}
-      </Typography>
+      {description && (
+        <Typography color="text.secondary" sx={{ maxWidth: 380 }}>
+          {description}
+        </Typography>
+      )}
       {action}
     </Stack>
   );

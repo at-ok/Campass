@@ -79,7 +79,6 @@ export default function Home() {
     <>
       <PageHeading
         title="時間割"
-        description="一週間を見渡して、今日の学びを始めよう。"
         action={
           <AddButton onClick={() => edit({ kind: "class" })}>
             授業を追加
@@ -112,10 +111,10 @@ export default function Home() {
           severity="info"
           sx={{ mb: 2.5 }}
           action={
-            <Button onClick={() => edit({ kind: "class" })}>追加する</Button>
+            <Button onClick={() => edit({ kind: "class" })}>授業を追加</Button>
           }
         >
-          最初の授業を登録しましょう。時間割の空いている場所からも追加できます。
+          時間割の空き枠を選んで授業を追加できます。
         </Alert>
       )}
       <Box
@@ -153,13 +152,6 @@ export default function Home() {
               });
             }}
           />
-          <Typography
-            variant="caption"
-            color="text.secondary"
-            sx={{ display: "block", mt: 1.5, px: 0.5 }}
-          >
-            毎週繰り返す授業を表示しています。授業を選ぶと編集できます。
-          </Typography>
         </Box>
         <Stack
           spacing={2.5}
@@ -234,10 +226,7 @@ export default function Home() {
             ) : (
               <Box sx={{ py: 2 }}>
                 <Typography sx={{ fontSize: 14, mb: 1 }}>
-                  授業のない日です
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  課題を進めたり、少し休んだり。自分のペースで過ごしましょう。
+                  この日の授業はありません
                 </Typography>
               </Box>
             )}

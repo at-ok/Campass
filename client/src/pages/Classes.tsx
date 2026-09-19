@@ -44,7 +44,6 @@ export default function ClassesPage() {
     <>
       <PageHeading
         title="授業一覧"
-        description="授業の情報を、ひとつの場所に。"
         action={
           <AddButton onClick={() => edit({ kind: "class" })}>
             授業を追加
@@ -154,16 +153,18 @@ export default function ClassesPage() {
         </Box>
       ) : (
         <EmptyState
-          title={search ? "授業が見つかりません" : "授業を登録しましょう"}
+          title={
+            search ? "授業が見つかりません" : "授業はまだ登録されていません"
+          }
           description={
             search
               ? "授業名、教員名、教室で検索できます。"
-              : "曜日と時限を選ぶだけで、時間割にも自動で反映されます。"
+              : "登録した授業は時間割に表示されます。"
           }
           action={
             !search && (
               <AddButton onClick={() => edit({ kind: "class" })}>
-                最初の授業を追加
+                授業を追加
               </AddButton>
             )
           }

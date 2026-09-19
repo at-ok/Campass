@@ -24,10 +24,7 @@ export default function SettingsPage() {
   const notify = useFeedback();
   return (
     <Box sx={{ maxWidth: 840 }}>
-      <PageHeading
-        title="設定"
-        description="使いやすさを、あなたに合わせて。"
-      />
+      <PageHeading title="設定" />
       <Paper variant="outlined" sx={{ overflow: "hidden" }}>
         <Box sx={{ p: { xs: 2.5, sm: 4 } }}>
           <Typography variant="h6" sx={{ mb: 2.5 }}>
@@ -66,9 +63,6 @@ export default function SettingsPage() {
             >
               表示モード
             </FormLabel>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5 }}>
-              見やすい明るさを選んでください。
-            </Typography>
             <RadioGroup
               aria-labelledby="theme-label"
               value={mode}

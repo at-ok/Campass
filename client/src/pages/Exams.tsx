@@ -43,7 +43,6 @@ export default function ExamsPage() {
     <>
       <PageHeading
         title="試験"
-        description="大切な日に向けて、余裕をもって準備。"
         action={
           <AddButton onClick={() => edit({ kind: "exam" })}>
             試験を追加
@@ -168,7 +167,6 @@ export default function ExamsPage() {
       ) : (
         <EmptyState
           title="予定されている試験はありません"
-          description="試験日と会場を登録しておくと、時間割の横でも確認できます。"
           action={
             <AddButton onClick={() => edit({ kind: "exam" })}>
               試験を追加
