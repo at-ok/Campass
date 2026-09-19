@@ -29,10 +29,11 @@ const result = spawnSync(
     "-e",
     `
   import assert from 'node:assert/strict';
-  const { default: handler } = await import('./dist/api-runtime-check/api/index.js');
-  assert.equal(typeof handler, 'function');
+  const { GET, POST } = await import('./dist/api-runtime-check/api/index.js');
+  assert.equal(typeof GET, 'function');
+  assert.equal(typeof POST, 'function');
   const { default: app } = await import('./dist/api-runtime-check/server/_core/app.js');
-  const health = await app.request('https://campass.example.com/api/health');
+  const health = await GET(new Request('https://campass.example.com/api/health'));
   assert.equal(health.status, 200);
   assert.equal(await health.text(), 'Server is running');
   const session = await app.request('https://campass.example.com/api/auth/get-session');
@@ -41,9 +42,16 @@ const result = spawnSync(
   const me = await app.request('https://campass.example.com/api/trpc/auth.me');
   assert.equal(me.status, 200);
   assert.equal((await me.json()).result.data.json, null);
+  const invalidSignup = await POST(new Request('https://campass.example.com/api/auth/sign-up/email', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', origin: 'https://campass.example.com' },
+    body: JSON.stringify({ name: 'Test', email: 'invalid-email', password: 'test-password' }),
+  }));
+  assert.equal(invalidSignup.status, 400);
+  assert.ok((await invalidSignup.json()).message);
   const { pool } = await import('./dist/api-runtime-check/server/db.js');
   await pool.end();
-  console.log('Unbundled Node ESM: API entry, health, session and tRPC checks passed');
+  console.log('Unbundled Node ESM: API entry, health, session, tRPC and registration POST checks passed');
 `,
   ],
   {

@@ -21,6 +21,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { signIn, signUp } from "@/lib/auth-client";
 import { setAuthReturnTo } from "@/lib/auth-return-to";
+import { authErrorMessage } from "@/lib/auth-error";
 import { trpc } from "@/lib/trpc";
 import { Brand } from "./Brand";
 export function AuthPage({ signup = false }: { signup?: boolean }) {
@@ -68,11 +69,7 @@ export function AuthPage({ signup = false }: { signup?: boolean }) {
             password: values.password,
           });
       if (result.error) {
-        setError(
-          signup
-            ? "アカウントを作成できませんでした。メールアドレスを確認してください。"
-            : "ログインできませんでした。メールアドレスとパスワードを確認してください。"
-        );
+        setError(authErrorMessage(result.error, signup));
         return;
       }
       await utils.auth.me.invalidate();
