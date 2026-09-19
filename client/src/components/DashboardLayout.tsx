@@ -322,7 +322,10 @@ function Shell({ children }: { children: ReactNode }) {
         color="transparent"
         sx={{
           bgcolor: "background.default",
-          zIndex: theme => theme.zIndex.drawer + 1,
+          zIndex: theme => ({
+            xs: theme.zIndex.appBar,
+            md: theme.zIndex.drawer + 1,
+          }),
         }}
       >
         <Toolbar
@@ -419,7 +422,6 @@ function Shell({ children }: { children: ReactNode }) {
         onClose={() => setDrawer(false)}
         sx={{
           display: { md: "none" },
-          zIndex: theme => theme.zIndex.appBar + 2,
           "& .MuiDrawer-paper": { width: 280, borderRadius: "0 24px 24px 0" },
         }}
       >
