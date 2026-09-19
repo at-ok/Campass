@@ -21,9 +21,11 @@ Campass is a comprehensive academic planner and scheduling application designed 
 
 ## Getting Started
 
+For a free personal deployment on Vercel + Neon, follow [the deployment guide](docs/DEPLOY.md).
+
 ### Prerequisites
 
-- Node.js (v20+ recommended)
+- Node.js 22
 - pnpm
 - PostgreSQL Database (Neon recommended)
 

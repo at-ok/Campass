@@ -107,8 +107,8 @@ temp/
 *.sqlite3
 
 # Drizzle ORM
-drizzle/**/*.sql
 .drizzle/
+.vercel/
 
 # Project specific
 uploads/

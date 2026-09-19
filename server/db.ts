@@ -17,8 +17,15 @@ if (!process.env.DATABASE_URL) {
   throw new Error("DATABASE_URL is required");
 }
 
-const pool = new pg.Pool({
+export const pool = new pg.Pool({
   connectionString: process.env.DATABASE_URL,
+  max: 5,
+  idleTimeoutMillis: 5000,
+  connectionTimeoutMillis: 10000,
+});
+
+pool.on("error", error => {
+  console.error("Unexpected idle database connection error:", error.message);
 });
 
 export const db = drizzle(pool);

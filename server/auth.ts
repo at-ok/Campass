@@ -2,15 +2,13 @@ import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { db } from "./db";
 import * as schema from "../shared/schema";
+import { getAuthConfig } from "./auth-config";
 
-export const AUTH_TRUSTED_ORIGINS = [
-  "http://localhost:5173",
-  "http://localhost:3000",
-];
+const authConfig = getAuthConfig(process.env);
+export const AUTH_TRUSTED_ORIGINS = authConfig.trustedOrigins;
 
 export const auth = betterAuth({
-  baseURL: process.env.BETTER_AUTH_URL || "http://localhost:3000",
-  trustedOrigins: AUTH_TRUSTED_ORIGINS,
+  ...authConfig,
   database: drizzleAdapter(db, {
     provider: "pg",
     schema: {
@@ -19,12 +17,6 @@ export const auth = betterAuth({
   }),
   emailAndPassword: {
     enabled: true,
-  },
-  socialProviders: {
-    google: {
-      clientId: process.env.GOOGLE_CLIENT_ID || "",
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
-    },
   },
   advanced: {
     defaultCookieAttributes: {
